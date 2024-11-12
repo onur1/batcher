@@ -18,16 +18,6 @@ go get github.com/onur1/batcher
 
 ## Usage
 
-Below is an example demonstrating how to use the `batcher` library.
-
-### Import the Library
-
-```go
-import "github.com/onur1/batcher"
-```
-
-### Example
-
 The following example sets up a `Batcher` that flushes either when 5 items are collected or 4 seconds have elapsed since the last flush:
 
 ```go
