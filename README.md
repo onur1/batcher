@@ -69,23 +69,28 @@ func main() {
 - **CountLoop**: Starts the main loop that listens to incoming items on the `input` channel and flushes batches based on count or time interval. Results are sent to the `output` channel provided by the caller.
 - **output Channel**: An output channel where `Count` structs are sent, representing each batch with the item count and the timestamp of the batch.
 
-## API Reference
+## API
 
-### `func NewBatcher[A any](flushInterval, batchSize int) *Batcher[A]`
+### `NewBatcher`
+
+```go
+func NewBatcher[A any](flushInterval, batchSize int) *Batcher[A]
+```
 
 Creates a new `Batcher` instance.
 
 - `flushInterval`: Time interval in seconds for flushing the batch if the count threshold hasn’t been met.
 - `batchSize`: Number of items to collect before the batch is flushed.
 
-### `func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan Count)`
+### `CountLoop`
+
+```go
+func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan Count)
+```
 
 Begins the batch processing loop. It listens for items on the `input` channel and emits batches based on count or time interval to the `output` channel. The caller is responsible for providing this output channel.
 
-### Structs
-
-- **Batcher**: The main struct that manages batching behavior and configuration.
-- **Count**: Represents a single batch, including the number of items in the batch and the timestamp at which it was created.
+**Count**: Represents a single batch, including the number of items in the batch and the timestamp at which it was created.
 
 ## License
 
