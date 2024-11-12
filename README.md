@@ -90,7 +90,14 @@ func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan 
 
 Begins the batch processing loop. It listens for items on the `input` channel and emits batches based on count or time interval to the `output` channel. The caller is responsible for providing this output channel.
 
-**Count**: Represents a single batch, including the number of items in the batch and the timestamp at which it was created.
+`Count` represents a single batch, including the number of items in the batch and the timestamp at which it was created.
+
+```go
+type Count struct {
+	Value int
+	Time  time.Time
+}
+```
 
 ## License
 
