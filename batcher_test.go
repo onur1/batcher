@@ -17,8 +17,8 @@ func TestBatcherBatchFlush(t *testing.T) {
 	defer cancel()
 
 	input := make(chan int)
-	dst := make(chan Count)
-	go batcher.CountLoop(ctx, input, dst)
+	output := make(chan Count)
+	go batcher.CountLoop(ctx, input, output)
 
 	// Send items equal to batch size
 	for i := 0; i < batchSize; i++ {
@@ -27,7 +27,7 @@ func TestBatcherBatchFlush(t *testing.T) {
 
 	// Wait for the batcher to emit a batch
 	select {
-	case count := <-dst:
+	case count := <-output:
 		if count.Value != batchSize {
 			t.Errorf("Expected batch size %d, got %d", batchSize, count.Value)
 		}
@@ -45,8 +45,8 @@ func TestBatcherIntervalFlush(t *testing.T) {
 	defer cancel()
 
 	input := make(chan int)
-	dst := make(chan Count)
-	go batcher.CountLoop(ctx, input, dst)
+	output := make(chan Count)
+	go batcher.CountLoop(ctx, input, output)
 
 	// Send fewer items than the batch size
 	for i := 0; i < batchSize-2; i++ {
@@ -55,7 +55,7 @@ func TestBatcherIntervalFlush(t *testing.T) {
 
 	// Wait for the batcher to emit due to interval flush
 	select {
-	case count := <-dst:
+	case count := <-output:
 		if count.Value != batchSize-2 {
 			t.Errorf("Expected interval flush of %d items, got %d", batchSize-2, count.Value)
 		}
@@ -73,12 +73,12 @@ func TestBatcherNoFlushWithoutData(t *testing.T) {
 	defer cancel()
 
 	input := make(chan int)
-	dst := make(chan Count)
-	go batcher.CountLoop(ctx, input, dst)
+	output := make(chan Count)
+	go batcher.CountLoop(ctx, input, output)
 
 	// Wait for a longer interval than the flush interval
 	select {
-	case <-dst:
+	case <-output:
 		t.Error("Expected no flush without data, but received a flush")
 	case <-time.After(time.Second * 2):
 		// Test passes if we reach here without a flush

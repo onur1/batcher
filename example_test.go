@@ -16,10 +16,10 @@ func ExampleBatcher() {
 
 	// Channel for sending items to the batcher
 	input := make(chan int)
-	dst := make(chan batcher.Count)
+	output := make(chan batcher.Count)
 
 	// Start the batcher's processing loop
-	go b.CountLoop(context.TODO(), input, dst)
+	go b.CountLoop(context.TODO(), input, output)
 
 	go func() {
 		// Simulate sending items to the batcher
@@ -33,7 +33,7 @@ func ExampleBatcher() {
 	}()
 
 	// Receive and process batches from the batcher's output channel
-	for count := range dst {
+	for count := range output {
 		fmt.Printf("Batch of %d items received after %.2f seconds\n", count.Value, time.Since(count.Time).Seconds())
 	}
 

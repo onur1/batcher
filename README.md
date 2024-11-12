@@ -7,7 +7,6 @@
 
 - **Batch by Count**: Collects and processes data once a specified item count is reached.
 - **Batch by Time**: Processes data at regular intervals if the item count is not yet reached.
-- **Flexible Data Collection**: Provides flexibility in handling data streams, making it useful for logging, monitoring, and other batching use cases.
 
 ## Installation
 
@@ -49,10 +48,10 @@ func main() {
 
     // Channels for input and batched output
     input := make(chan int)
-    dst := make(chan batcher.Count)
+    output := make(chan batcher.Count)
 
     // Start the batcher's processing loop
-    go b.CountLoop(context.TODO(), input, dst)
+    go b.CountLoop(context.TODO(), input, output)
 
     // Simulate sending items to the batcher
     go func() {
@@ -64,7 +63,7 @@ func main() {
     }()
 
     // Process batches from the batcher's output channel
-    for count := range dst {
+    for count := range output {
         fmt.Printf("Batch of %d items received at %v\n", count.Value, count.Time)
     }
 }
@@ -77,8 +76,8 @@ func main() {
 ### Explanation
 
 - **NewBatcher**: Creates a new `Batcher` instance with the specified flush interval (in seconds) and batch size.
-- **CountLoop**: Starts the main loop that listens to incoming items on the `input` channel and flushes batches based on count or time interval. Results are sent to the `dst` channel provided by the caller.
-- **dst Channel**: An output channel where `Count` structs are sent, representing each batch with the item count and the timestamp of the batch.
+- **CountLoop**: Starts the main loop that listens to incoming items on the `input` channel and flushes batches based on count or time interval. Results are sent to the `output` channel provided by the caller.
+- **output Channel**: An output channel where `Count` structs are sent, representing each batch with the item count and the timestamp of the batch.
 
 ## API Reference
 
@@ -89,9 +88,9 @@ Creates a new `Batcher` instance.
 - `flushInterval`: Time interval in seconds for flushing the batch if the count threshold hasn’t been met.
 - `batchSize`: Number of items to collect before the batch is flushed.
 
-### `func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, dst chan Count)`
+### `func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan Count)`
 
-Begins the batch processing loop. It listens for items on the `input` channel and emits batches based on count or time interval to the `dst` channel. The caller is responsible for providing this output channel.
+Begins the batch processing loop. It listens for items on the `input` channel and emits batches based on count or time interval to the `output` channel. The caller is responsible for providing this output channel.
 
 ### Structs
 

@@ -41,7 +41,7 @@ type prevCur[A any] struct {
 
 // CountLoop listens for incoming items on a provided channel and flushes the counts
 // either when the batch size is reached or the flush interval has passed.
-func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, dst chan Count) {
+func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan Count) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
@@ -68,7 +68,7 @@ LOOP:
 			v.prev = v.now
 			v.now = b.nextState(t, v.now)
 			if v.now.pending == 0 && (v.prev.cursor < v.now.cursor) {
-				dst <- Count{
+				output <- Count{
 					Value: v.now.cursor - v.prev.cursor,
 					Time:  v.now.seen,
 				}
@@ -79,7 +79,7 @@ LOOP:
 		}
 	}
 
-	close(dst)
+	close(output)
 }
 
 type batcherState struct {
