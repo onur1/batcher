@@ -9,7 +9,6 @@ import (
 // or a time interval. It emits Counts indicating how many values have been collected within
 // each interval.
 type Batcher[A any] struct {
-	// C             chan Count // Channel through which Counts are emitted
 	flushInterval int // Flush interval in seconds
 	batchSize     int // Number of items to collect before flushing
 }
@@ -21,7 +20,6 @@ func NewBatcher[A any](flushInterval, batchSize int) *Batcher[A] {
 		flushInterval = 1
 	}
 	return &Batcher[A]{
-		// C:             make(chan Count),
 		flushInterval: flushInterval,
 		batchSize:     batchSize,
 	}
