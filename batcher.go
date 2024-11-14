@@ -45,34 +45,37 @@ func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan 
 
 	t, v := Count{}, prevCur[batcherState]{now: batcherState{}}
 
-	cctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	var ok bool
+	var ok bool // Tracks whether the input channel is closed
 
 LOOP:
 	for {
 		select {
-		case <-cctx.Done():
+		case <-ctx.Done():
+			// Exit the loop if context is done
 			break LOOP
 		case _, ok = <-input:
 			if !ok {
+				// If input is closed, set to nil to avoid further reads
 				input = nil
 				break
 			}
-			t.Value = t.Value + 1
+			// Update state based on input
+			t.Value++
 			t.Time = time.Now()
 		case <-ticker.C:
+			// Update state on ticker
 			v.prev = v.now
 			v.now = b.nextState(t, v.now)
-			if v.now.pending == 0 && (v.prev.cursor < v.now.cursor) {
+			if v.now.pending == 0 && v.prev.cursor < v.now.cursor {
+				// Send count difference if there's a cursor change
 				output <- Count{
 					Value: v.now.cursor - v.prev.cursor,
 					Time:  v.now.seen,
 				}
-				if input == nil {
-					cancel()
-				}
+			}
+			// Exit if input is closed and all items are flushed
+			if input == nil && t.Value == v.now.cursor {
+				break LOOP
 			}
 		}
 	}
