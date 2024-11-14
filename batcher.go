@@ -39,7 +39,7 @@ type prevCur[A any] struct {
 
 // CountLoop listens for incoming items on a provided channel and flushes the counts
 // either when the batch size is reached or the flush interval has passed.
-func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan Count) {
+func (b *Batcher[A]) CountLoop(ctx context.Context, input <-chan A, output chan<- Count) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
