@@ -1,5 +1,6 @@
-
 # batcher
+
+![batcher](./batcher-gopher.webp)
 
 **batcher** is a Go library that buffers and batches data items based on configurable thresholds of count or time interval. It enables efficient data handling by processing items in batches either when a specified number of items is collected or when a time interval has passed since the last batch.
 
